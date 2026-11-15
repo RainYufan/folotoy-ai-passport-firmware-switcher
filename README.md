@@ -53,6 +53,13 @@ The merged image includes the bootloader, partition table, the switcher, and a
 preloaded hardware-test app in slot A; the remaining slots stay empty until you
 flash them.
 
+## Flash firmware into slots
+
+Use the companion desktop tool
+[ai-passport-slot-flasher](https://github.com/RainYufan/ai-passport-slot-flasher):
+pick a firmware and a slot, and it writes only that slot — never the switcher
+itself. macOS and Windows packages are built by its GitHub Actions.
+
 ## Put a firmware into a slot
 
 Slots accept **app-only images** (the file starts with the `0xE9` magic byte),

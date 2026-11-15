@@ -47,6 +47,13 @@ esptool --chip esp32c3 -p /dev/cu.usbmodem* -b 921600 \
 合并镜像包含 bootloader、分区表、切换器本体，以及预装在槽A 的硬件测试
 应用；其余槽位保持为空，直到你刷入固件。
 
+## 用配套工具刷槽位
+
+使用配套桌面工具
+[ai-passport-slot-flasher](https://github.com/RainYufan/ai-passport-slot-flasher):
+选择固件和槽位即可,只写所选槽位、不碰切换器本体。macOS 与 Windows 安装包
+由其 GitHub Actions 自动构建。
+
 ## 往槽位里装固件
 
 槽位只接受**纯 app 镜像**（文件以 `0xE9` 魔数开头），单个不超过上表限制。
