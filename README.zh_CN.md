@@ -51,21 +51,32 @@ esptool --chip esp32c3 -p /dev/cu.usbmodem* -b 921600 \
 
 使用配套桌面工具
 [ai-passport-slot-flasher](https://github.com/RainYufan/ai-passport-slot-flasher):
-选择固件和槽位即可,只写所选槽位、不碰切换器本体。macOS 与 Windows 安装包
-由其 GitHub Actions 自动构建。
+选择固件和槽位即可,只写所选槽位、不碰切换器本体。安装包(Windows `.exe`、
+macOS `.dmg`、Linux `.tar.gz`)在其
+[Releases](https://github.com/RainYufan/ai-passport-slot-flasher/releases)。
+
+## 先提取 app 镜像(重要)
+
+玩法社区下载的是 `esp-merged-0x0` **完整合并镜像**,槽位只接受**纯 app 镜像**
+(以 `0xE9` 魔数开头)。所以刷槽位前通常要先提取。推荐用同一仓库里的
+**extract-play** 工具:
+
+- 图形界面 `extract_play_gui`:粘贴玩法链接,或把合并镜像 `.bin` 拖进窗口,点
+  「提取 app 镜像」即得 `xxx-app.bin`。
+- 命令行:`python extract_play.py "<玩法链接>"`(Windows 双击 `extract_play.exe`)。
+
+没有工具时,教程里也给了手动 Python 片段(要点:**整段复制 app 分区、不裁剪**,
+否则会切掉镜像末尾的校验摘要导致刷入后无法启动)。
 
 ## 往槽位里装固件
 
-槽位只接受**纯 app 镜像**（文件以 `0xE9` 魔数开头），单个不超过上表限制。
+拿到 `xxx-app.bin` 后,用 esptool 写入对应偏移(单个不超过上表限制):
 
 ```bash
 # 双槽示例:把固件写入槽B(偏移 0x470000)
 esptool --chip esp32c3 -p /dev/cu.usbmodem* -b 921600 \
-    write_flash --verify 0x470000 你的固件.bin
+    write_flash --verify 0x470000 xxx-app.bin
 ```
-
-玩法社区下载的合并镜像（`esp-merged-0x0`）不是 app 镜像，需要先提取；
-现成的 Python 提取片段在教程里。
 
 ## 使用
 

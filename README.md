@@ -58,22 +58,33 @@ flash them.
 Use the companion desktop tool
 [ai-passport-slot-flasher](https://github.com/RainYufan/ai-passport-slot-flasher):
 pick a firmware and a slot, and it writes only that slot — never the switcher
-itself. macOS and Windows packages are built by its GitHub Actions.
+itself. Installers (Windows `.exe`, macOS `.dmg`, Linux `.tar.gz`) are on its
+[Releases](https://github.com/RainYufan/ai-passport-slot-flasher/releases).
+
+## Extract the app image first (important)
+
+The play store serves `esp-merged-0x0` full images, but a slot only accepts a
+**plain app image** (file starts with the `0xE9` magic byte). Use the
+**extract-play** tool from the same repo:
+
+- GUI `extract_play_gui`: paste the play link, or drag a merged `.bin` into the
+  window, click "提取 app 镜像" to get `xxx-app.bin`.
+- CLI: `python extract_play.py "<play link>"` (Windows: double-click
+  `extract_play.exe`).
+
+A manual Python snippet is in the tutorials — the key rule is **copy the whole
+app region, do not trim**, or you cut the trailing digest and the image won't
+boot.
 
 ## Put a firmware into a slot
 
-Slots accept **app-only images** (the file starts with the `0xE9` magic byte),
-each no larger than the slot limit above.
+With `xxx-app.bin` ready, flash it with esptool to the matching offset:
 
 ```bash
 # dual-slot example: write a firmware to slot B (offset 0x470000)
 esptool --chip esp32c3 -p /dev/cu.usbmodem* -b 921600 \
-    write_flash --verify 0x470000 your-firmware.bin
+    write_flash --verify 0x470000 xxx-app.bin
 ```
-
-Merged images (`esp-merged-0x0`) downloaded from the AI Passport play store are
-not app images — extract the app image from the merged file first. A ready-made
-Python snippet for that is in the tutorials.
 
 ## Use
 

@@ -69,7 +69,18 @@ esptool --chip esp32c3 -p /dev/cu.usbmodem1101 -b 921600 \
 | C | `0x520000` | `write_flash 0x520000 你的固件.bin` |
 
 玩法社区下载的是 `esp-merged-0x0` 完整镜像,不能直接进槽位,需要先提取出
-app 镜像,例如:
+app 镜像。推荐用配套工具 **extract-play**(图形界面或命令行):
+
+- 图形界面 `extract_play_gui`:打开后**粘贴玩法链接**,或把合并镜像 `.bin`
+  **拖进窗口**/点「选择本地文件…」,再点「提取 app 镜像」,即得到 `xxx-app.bin`。
+- 命令行:`python extract_play.py "<玩法链接>"`(Windows 也可直接双击
+  `extract_play.exe` 后粘贴链接)。
+
+下载见[刷写助手仓库的 Releases](https://github.com/RainYufan/ai-passport-slot-flasher/releases)
+(Windows `.exe`、macOS `.dmg`、Linux `.tar.gz`)。
+
+没有工具时,也可用这段 Python 手动提取(注意**整段复制、不裁剪**,否则会切掉
+镜像末尾的 SHA-256 校验摘要,导致刷入后无法启动):
 
 ```python
 import struct
@@ -83,7 +94,7 @@ while off + ENTRY.size <= len(tbl):
         break
     _, kind, _, poff, size, _, _ = ENTRY.unpack_from(tbl, off)
     if kind == 0:  # app 分区
-        open("extracted-app.bin", "wb").write(data[poff:poff+size])
+        open("extracted-app.bin", "wb").write(data[poff:])  # 整段,不裁剪
         break
     off += ENTRY.size
 ```
@@ -91,9 +102,9 @@ while off + ENTRY.size <= len(tbl):
 校验后刷入:
 
 ```bash
-esptool image_info extracted-app.bin        # 必须打印出有效的 ESP32-C3 镜像
+esptool image_info extracted-app.bin        # 应显示 Checksum/Validation Hash valid
 esptool --chip esp32c3 -p /dev/cu.usbmodem1101 -b 921600 \
-    write_flash --verify 0x320000 extracted-app.bin
+    write_flash --verify 0x470000 extracted-app.bin
 ```
 
 选择器会读取每个镜像的应用描述(项目名、版本、日期),只列出有效固件。
